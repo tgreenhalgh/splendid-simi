@@ -30,6 +30,11 @@ map.directive('map', ['Map', '$rootScope', function(Map, $rootScope) {
     $reserveSpot.on('click', function(e) {
       console.log('Reserving from mapDirective.js');
       Map.reserveSpot(); 
+      $loadingText.text("reserving your spot");
+      $loading.addClass('show');
+      setTimeout(function(){
+        $loading.removeClass('show');
+      },1000);
     });
 
     $anotherSpot.on('click',function(e) {
