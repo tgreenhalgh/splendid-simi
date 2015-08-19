@@ -10,6 +10,8 @@ middleware(app, express);
 
 app.set('port', process.env.PORT || 8080);
 
+var firedb = new Firebase(fb_keys.url);
+
 //Helper Functions
 //Function to calculate the euclidean distance between the user location and a parking spot
 var distance = function(latU, longU, latP, longP) {
@@ -38,7 +40,8 @@ app.post('/api/init', function(req, res) {
         firedb.child("Metered Parking Spots").push({
           meter_id: obj.meter_id,
           latitude: obj.latitude,
-          longitude: obj.longitude
+          longitude: obj.longitude/*
+          compositeCrimeScore: 0*/  //sets starting point for crime scores
         });
       }
       res.send(200);
