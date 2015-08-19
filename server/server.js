@@ -37,7 +37,7 @@ app.post('/api/init', function(req, res) {
       for (var key in body) {
         //console.log("Value at",key, " is",body[key]);
         var obj = body[key];
-        firedb.child("Metered Parking Spots").push({
+        firedb.child("MeteredParkingSpots").push({
           meter_id: obj.meter_id,
           latitude: obj.latitude,
           longitude: obj.longitude/*
