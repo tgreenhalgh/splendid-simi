@@ -80,6 +80,8 @@ usersRef.on('child_added', function(childSnapshot, prevChildKey) {
             if (pSpots[key].reserved < Date.now()){
               freeSpots[key] = pSpots[key];
             }
+          } else {
+            freeSpots[key] = pSpots[key];
           }
         }
       } // end if condition to check if the parking spot is within range
