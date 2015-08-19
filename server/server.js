@@ -20,7 +20,7 @@ var distance = function(latU, longU, latP, longP) {
 
 //---------------------------This section is to initalize our own Firebase MeterParkingSpots Database from the Santa Monica API--------------------------
 //GET /api/init 
-app.post('/api/init', function(req, res) {
+app.get('/api/init', function(req, res) {
   console.log('server.js says: POST request for init received.');
 
   //Store all the metered parking spot information on our own database
@@ -37,11 +37,11 @@ app.post('/api/init', function(req, res) {
       for (var key in body) {
         //console.log("Value at",key, " is",body[key]);
         var obj = body[key];
-        firedb.child("MeteredParkingSpots").push({
+        firedb.child("MeteredParkingSpots").child(obj.meter_id).set({
           meter_id: obj.meter_id,
           latitude: obj.latitude,
-          longitude: obj.longitude/*
-          compositeCrimeScore: 0*/  //sets starting point for crime scores
+          longitude: obj.longitude,
+          compositeCrimeScore: 0  //sets starting point for crime scores
         });
       }
       res.send(200);
