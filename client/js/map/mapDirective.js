@@ -34,18 +34,12 @@ map.directive('map', ['Map', '$rootScope', function(Map, $rootScope) {
 
     $anotherSpot.on('click',function(e) {
       Map.findSpot();
-      if ($reserveSpot.prop('disabled')){
-        $reserveSpot.prop('disabled', false);
-        $reserveSpot.toggle();
-      }
+      $reserveSpot.show();
     });
 
     $parkingLot.on('click',function(e) {
       Map.findLot();
-      if (!$reserveSpot.prop('disabled')){
-        $reserveSpot.prop('disabled', true);
-        $reserveSpot.toggle();
-      }
+      $reserveSpot.hide();
     });
 
     Map.init(mapCanvas);
