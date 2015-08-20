@@ -97,16 +97,19 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
 
   var reserveSpot = function(){
     // tell db to mark currentMeterId as reserved
-    console.log('reserveSpot from mapService.js with ', currentMeterId);
-    Locator.reserveSpace(currentMeterId)
-    .then(function(meter){
-      console.log('Marked meter: '+ meter);
-    });
+    if (currentMeterId !== 'LOT'){
+      $rootScope.$broadcast('parkAssist:changeLoadingText','reserving your spot');
+      $rootScope.$broadcast('parkAssist:showLoadingText');
+      console.log('reserveSpot from mapService.js with ', currentMeterId);
+      Locator.reserveSpace(currentMeterId)
+      .then(function(meter){
+        $rootScope.$broadcast('parkAssist:hideLoadingText');
+        console.log('Marked meter: '+ meter);
+      });
+    }
   };
 
   var findLot = function(tuple, newDestination) {
-    console.log('tuple in findLot', tuple);
-    console.log('Finding a parking lot');
     var pLot;
 
     if(newDestination) {
@@ -118,7 +121,6 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
 
     // If user already has a spot and is just requesting a new one
     if(firstLotInitialized && !newDestination) {
-      console.log('lotQueue', lotQueue);
       pLot = lotQueue.shift();
 
       if(!pLot) {
@@ -128,7 +130,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
       }
 
       setMeter(pLot);
-      currentMeterId = pLot.lot_id; // change later; you shouldnt be able to reserve lots
+      currentMeterId = 'LOT'; // change later; you shouldnt be able to reserve lots
       User.setDestination(meterLoc);
       User.calcRoute()
       .then(function() {
@@ -164,7 +166,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
         firstLotInitialized = true;
 
         setMeter(pLot);
-        currentMeterId = pLot.meter_id; // change later; you shouldnt be able to reserve lots
+        currentMeterId = 'LOT'; // change later; you shouldnt be able to reserve lots
         User.setDestination(meterLoc);
 
         User.calcRoute()
