@@ -26,6 +26,7 @@ app.get('/api/init', function(req, res) {
   //Store all the metered parking spot information on our own database
   //Make a GET request
   var url = 'https://parking.api.smgov.net/meters'; //Santa Monica api that has location data on all metered parking spots
+  var lotUrl = 'https://parking.api.smgov.net/lots';
   request(url, function(error, response, body) {
     if (error) {
       console.log('Error getting data. Error:', error);
@@ -37,7 +38,8 @@ app.get('/api/init', function(req, res) {
       for (var key in body) {
         //console.log("Value at",key, " is",body[key]);
         var obj = body[key];
-        firedb.child("MeteredParkingSpots").child(obj.meter_id).set({
+
+        firecloud.child("MeteredParkingSpots").child(obj.meter_id).set({
           meter_id: obj.meter_id,
           latitude: obj.latitude,
           longitude: obj.longitude,
@@ -48,6 +50,35 @@ app.get('/api/init', function(req, res) {
     }
   });
 }); // /api/init ends here
+
+app.post('/api/init/lots', function(req, res) {
+  console.log('server.js says: POST request for lots init received.');
+
+  //Store all the metered parking spot information on our own database
+  //Make a GET request
+  var lotUrl = 'https://parking.api.smgov.net/lots'; //Santa Monica api that has location data on all metered parking spots
+  
+  request(lotUrl, function(error, response, body) {
+    if (error) {
+      console.log('Error getting data. Error:', error);
+    }
+    if (!error && response.statusCode == 200) {
+      body = JSON.parse(body);
+
+      //One time update of the database with the metered spots info
+      for (var key in body) {
+        //console.log("Value at",key, " is",body[key]);
+        var obj = body[key];
+        firecloud.child("ParkingLots").child(obj.id).set({
+          lot_id: obj.id,
+          latitude: obj.latitude,
+          longitude: obj.longitude
+        });
+      }
+      res.send(200);
+    }
+  });
+}); // /api/init/lots ends here
 //------------------------------------------End of Initializing MeterParkingSpots database-----------------------------------------------
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -91,6 +122,27 @@ usersRef.on('child_added', function(childSnapshot, prevChildKey) {
     } // end of for loop for pSpots
     firecloud.child('Users').child(userKey).child('Recommendations').set(freeSpots); //adds the list of recomendations to the User in the database
   });
+
+  //getlots
+  firecloud.child('ParkingLots').once('value', function(snapshot) {
+
+    var pLots = snapshot.val(); //initializes variables for storing user specific information
+    var closeSpots = [];
+    var freeLots = {};
+
+    for (var key in pLots) {
+      var displacement = distance(tuple[0], tuple[1], pLots[key].latitude, pLots[key].longitude);
+      if (displacement < radius) {
+
+        pLots[key].distance = displacement;
+        if (pLots[key].available_spaces > 5) {
+          freeLots[key] = pLots[key];
+        }
+      } // end if condition to check if the parking lot is within range
+    } // end of for loop for pLots
+    firecloud.child('Users').child(userKey).child('LotRecommendations').set(freeLots); //adds the list of recomendations to the User in the database
+  });
+
 });
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
