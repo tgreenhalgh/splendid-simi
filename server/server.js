@@ -4,6 +4,7 @@ var http = require('http');
 var request = require('request');
 var Firebase = require('firebase');
 var fb_keys = require('../firebaselink.js');
+var crimeScoreMap = require('./crimeScoreMap.js');
 
 var app = express();
 middleware(app, express);
