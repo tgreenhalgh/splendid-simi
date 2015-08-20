@@ -8,6 +8,7 @@ map.directive('map', ['Map', '$rootScope', function(Map, $rootScope) {
     var $changeDest = $el.find('.change-destination');
     var $reserveSpot = $el.find('.reserve-spot');
     var $anotherSpot = $el.find('.another-spot');
+    var $parkingLot = $el.find('.parking-lot');
     var $loading = $el.find('.loading');
     var $loadingText = $loading.find('.loading-text');
 
@@ -39,6 +40,10 @@ map.directive('map', ['Map', '$rootScope', function(Map, $rootScope) {
 
     $anotherSpot.on('click',function(e) {
       Map.findSpot();
+    });
+
+    $parkingLot.on('click',function(e) {
+      Map.findLot();
     });
 
     Map.init(mapCanvas);
