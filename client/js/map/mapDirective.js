@@ -34,10 +34,12 @@ map.directive('map', ['Map', '$rootScope', function(Map, $rootScope) {
 
     $anotherSpot.on('click',function(e) {
       Map.findSpot();
+      $reserveSpot.show();
     });
 
     $parkingLot.on('click',function(e) {
       Map.findLot();
+      $reserveSpot.hide();
     });
 
     Map.init(mapCanvas);
