@@ -149,25 +149,24 @@ usersRef.on('child_added', function(childSnapshot, prevChildKey) {
 });
 
 //update crime data
-// promises ensure all crimeData and Parking Meter data is received before crimeScoreMap is called 
-// setInterval(function() {
-//   return crimeScoreForParkingMeters.crimesFromDatabase()
-//     .then(function(crimes) {
-//       crimeData = crimeScoreForParkingMeters.makeArrayofNewCrimes(crimes, utility.calculateYesterday());
-//       return crimeData;
-//     })
-//     .then(function(crimeData) {
-//       // uses an array to return multiple values to the next function
-//       return [crimeData, crimeScoreForParkingMeters.parkingMetersFromDatabase()];
-//     })
-//     // use spread instead of then to unpack the array of arguments 
-//     .spread(function(crimeData, parkingMeters) {
-//         return crimeScoreForParkingMeters.crimeScoreMap(parkingMeters, crimeData);
-//     }),
-//     function(error) {
-//       return errorHandling(error);
-//     };
-// }, 86400000);
+setInterval(function() {
+  return crimeScoreForParkingMeters.crimesFromDatabase()
+    .then(function(crimes) {
+      crimeData = crimeScoreForParkingMeters.makeArrayofNewCrimes(crimes, utility.calculateYesterday());
+      return crimeData;
+    })
+    .then(function(crimeData) {
+      // uses an array to return multiple values to the next function
+      return [crimeData, crimeScoreForParkingMeters.parkingMetersFromDatabase()];
+    })
+    // use spread instead of then to unpack the array of arguments 
+    .spread(function(crimeData, parkingMeters) {
+        return crimeScoreForParkingMeters.crimeScoreMap(parkingMeters, crimeData);
+    }),
+    function(error) {
+      return errorHandling(error);
+    };
+}, 86400000);
 
 // updates parking meter's compositeCrimeScore using crimes from the past year 
 var calculateCompositeCrimeforParkingMeters = function() {

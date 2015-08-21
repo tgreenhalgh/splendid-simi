@@ -19,10 +19,10 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
   };
 
   var getDangerRating = function (crimeScore) {
-    var maxCrimeScore = 900;
-    if (crimeScore < maxCrimeScore/3) {
+    var maxCrimeScore = 1000;
+    if (crimeScore < maxCrimeScore/2) {
       return '../img/parkingGreen.png';
-    } else if (crimeScore < maxCrimeScore*2/3) {
+    } else if (crimeScore < maxCrimeScore*3/4) {
       return '../img/parkingYellow.png';
     } else { return '../img/parkingRed.png'; }
   }
