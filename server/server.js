@@ -190,7 +190,7 @@ var calculateCompositeCrimeforParkingMeters = function() {
 }
 
 // should be called only once to initialize composite scores for meters in database 
-calculateCompositeCrimeforParkingMeters();
+//calculateCompositeCrimeforParkingMeters();
 
 
 
