@@ -5,7 +5,7 @@ var http = require('http');
 var request = require('request');
 var Firebase = require('firebase');
 var fb_keys = require('../firebaselink.js');
-var crimeScoreForParkingMeters = require('./crimeScoreMap.js');
+var crimeScores = require('./crimeScoreMap.js');
 
 
 var app = express();
@@ -22,8 +22,8 @@ var distance = function(latU, longU, latP, longP) {
 }
 
 //---------------------------This section is to initalize our own Firebase MeterParkingSpots Database from the Santa Monica API--------------------------
-//GET /api/init 
-app.get('/api/init', function(req, res) {
+//GET /api/init
+app.post('/api/init', function(req, res) {
   console.log('server.js says: POST request for init received.');
 
   //Store all the metered parking spot information on our own database
@@ -60,7 +60,7 @@ app.post('/api/init/lots', function(req, res) {
   //Store all the metered parking spot information on our own database
   //Make a GET request
   var lotUrl = 'https://parking.api.smgov.net/lots'; //Santa Monica api that has location data on all metered parking spots
-  
+
   request(lotUrl, function(error, response, body) {
     if (error) {
       console.log('Error getting data. Error:', error);
@@ -75,7 +75,8 @@ app.post('/api/init/lots', function(req, res) {
         firecloud.child("ParkingLots").child(obj.id).set({
           lot_id: obj.id,
           latitude: obj.latitude,
-          longitude: obj.longitude
+          longitude: obj.longitude,
+          compositeCrimeScore: 0
         });
       }
       res.send(200);
@@ -150,47 +151,46 @@ usersRef.on('child_added', function(childSnapshot, prevChildKey) {
 
 //update crime data
 setInterval(function() {
-  return crimeScoreForParkingMeters.crimesFromDatabase()
+  return crimeScores.crimesFromDatabase()
     .then(function(crimes) {
-      crimeData = crimeScoreForParkingMeters.makeArrayofNewCrimes(crimes, utility.calculateYesterday());
+      crimeData = crimeScores.makeArrayofNewCrimes(crimes, utility.calculateYesterday());
       return crimeData;
     })
     .then(function(crimeData) {
       // uses an array to return multiple values to the next function
-      return [crimeData, crimeScoreForParkingMeters.parkingMetersFromDatabase()];
+      return [crimeScores.parkingMetersFromDatabase(), crimeScores.parkingLotsFromDatabase(), crimeData];
     })
-    // use spread instead of then to unpack the array of arguments 
-    .spread(function(crimeData, parkingMeters) {
-        return crimeScoreForParkingMeters.crimeScoreMap(parkingMeters, crimeData);
+    // use spread instead of then to unpack the array of arguments
+    .spread(function(parkingMeters, parkingLots, crimeData) {
+        return crimeScores.crimeScoreMap(parkingMeters, parkingLots, crimeData);
     }),
     function(error) {
       return errorHandling(error);
     };
 }, 86400000);
 
-// updates parking meter's compositeCrimeScore using crimes from the past year 
-var calculateCompositeCrimeforParkingMeters = function() {
-  return crimeScoreForParkingMeters.crimesFromDatabase()
+// updates parking meter's compositeCrimeScore using crimes from the past year
+var calculateCompositeCrimeforParkingAreas = function() {
+  return crimeScores.crimesFromDatabase()
     .then(function(crimes) {
-      crimeData = crimeScoreForParkingMeters.makeArrayofAllCrimes(crimes);
+      crimeData = crimeScores.makeArrayofAllCrimes(crimes);
       return crimeData;
     })
     .then(function(crimeData) {
       // uses an array to return multiple values to the next function
-      return [crimeData, crimeScoreForParkingMeters.parkingMetersFromDatabase()];
+      return [crimeScores.parkingMetersFromDatabase(), crimeScores.parkingLotsFromDatabase(), crimeData];
     })
-    // use spread instead of then to unpack the array of arguments 
-    .spread(function(crimeData, parkingMeters) {
-        return crimeScoreForParkingMeters.crimeScoreMap(parkingMeters, crimeData);
+    // use spread instead of then to unpack the array of arguments
+    .spread(function(parkingMeters, parkingLots, crimeData) {
+        return crimeScores.crimeScoreMap(parkingMeters, parkingLots, crimeData, true);
     }),
     function(error) {
       return errorHandling(error);
     };
 }
 
-// should be called only once to initialize composite scores for meters in database 
-//calculateCompositeCrimeforParkingMeters();
-
+// should be called only once to initialize composite scores for meters in database
+// calculateCompositeCrimeforParkingAreas();
 
 
 
