@@ -17,12 +17,22 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
       dbUser.set(null);
     }
   };
-  
+
+  var getDangerRating = function (crimeScore) {
+    var maxCrimeScore = 500
+    if (crimeScore < maxCrimeScore/3) {
+      return '../img/parkingGreen.png';
+    } else if (crimeScore < maxCrimeScore*2/3) {
+      return '../img/parkingYellow.png';
+    } else { return '../img/parkingRed.png'; }
+  }
+
   var setMeter = function(pSpot) {
     var spot = [pSpot.latitude, pSpot.longitude];
     meterLoc = new google.maps.LatLng(spot[0], spot[1]);
+    var parkingPic = getDangerRating(pSpot.compositeCrimeScore)
 
-    MeterMarkers.addMarker(map, true, meterLoc);
+    MeterMarkers.addMarker(map, true, meterLoc, parkingPic);
   };
 
   var findSpot = function(tuple, newDestination) {

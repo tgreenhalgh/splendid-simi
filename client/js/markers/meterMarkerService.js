@@ -70,11 +70,11 @@ marker.factory('MeterMarkers', ['Geocoder', function(Geocoder) {
     return new InfoBubble(infoBubbleOptions);
   };
 
-  var addMarker = function(map, active, LatLng) {
+  var addMarker = function(map, active, LatLng, scaledCrimeParkingPic) {
     var lat = LatLng.G;
     var lng = LatLng.K;
     var image = {
-      url: '../img/parking.png',
+      url: scaledCrimeParkingPic,
       size: new google.maps.Size(50, 50),
       origin: new google.maps.Point(0, 0),
       anchor: new google.maps.Point(17, 34),
@@ -85,7 +85,7 @@ marker.factory('MeterMarkers', ['Geocoder', function(Geocoder) {
       infoBubble.close();
       marker.setMap(null);
     }
-    
+
     marker = new google.maps.Marker({
       active: active,
       position: LatLng,
