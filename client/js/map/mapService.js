@@ -21,16 +21,32 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
   var getDangerRating = function (crimeScore) {
     var maxCrimeScore = 1000;
     if (crimeScore < maxCrimeScore/2) {
-      return '../img/parkingGreen.png';
+      return 'green';
     } else if (crimeScore < maxCrimeScore*3/4) {
-      return '../img/parkingYellow.png';
+      return 'yellow';
     } else { return '../img/parkingRed.png'; }
   }
 
   var setMeter = function(pSpot) {
     var spot = [pSpot.latitude, pSpot.longitude];
     meterLoc = new google.maps.LatLng(spot[0], spot[1]);
-    var parkingPic = getDangerRating(pSpot.compositeCrimeScore)
+    var parkingPic;
+    var ratingColor = getDangerRating(pSpot.compositeCrimeScore)
+    if (!pSpot.lot_id && ratingColor = 'red') {
+      parkingPic = '../img/parkingRed.png'
+    } else if (!pSpot.lot_id && ratingColor = 'yellow') {
+      parkingPic = '../img/parkingYellow.png'
+    } else if (!pSpot.lot_id && ratingColor = 'green') {
+      parkingPic = '../img/parkingGreen.png'
+    } else if (pSpot.lot_id && ratingColor = 'red') {
+      parkingPic = '../img/lotRed.png'
+    } else if (pSpot.lot_id && ratingColor = 'yellow') {
+      parkingPic = '../img/lotYellow.png'
+    } else if (pSpot.lot_id && ratingColor = 'green') {
+      parkingPic = '../img/lotGreen.png'
+    } else {
+      parkingPic = '../img/parking.png'
+    }
 
     MeterMarkers.addMarker(map, true, meterLoc, parkingPic);
   };
