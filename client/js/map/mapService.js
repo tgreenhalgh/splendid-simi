@@ -19,7 +19,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
   };
 
   var getDangerRating = function (crimeScore) {
-    var maxCrimeScore = 500
+    var maxCrimeScore = 900;
     if (crimeScore < maxCrimeScore/3) {
       return '../img/parkingGreen.png';
     } else if (crimeScore < maxCrimeScore*2/3) {
@@ -92,7 +92,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
         firstSpotInitialized = true;
 
         setMeter(pSpot);
-        currentMeterId = pSpot.meter_id; 
+        currentMeterId = pSpot.meter_id;
         User.setDestination(meterLoc);
 
         User.calcRoute()
@@ -217,7 +217,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
 
         findLot([lat,lng]);
         findSpot([lat,lng]);
-        
+
       });
 
     }, null);
