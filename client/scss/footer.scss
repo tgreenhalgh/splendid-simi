@@ -91,7 +91,7 @@
     border-width: 2px;
   }
   @media screen and (min-width: $mobile-large) {
-    width: 50%;
+    // width: 50%;
     float: right;
     text-align: right;
     &:nth-child(odd) {
