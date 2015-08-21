@@ -113,7 +113,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
       console.log('reserveSpot from mapService.js with ', currentMeterId);
       Locator.reserveSpace(currentMeterId)
       .then(function(meter){
-        $rootScope.$broadcast('parkAssist:hideLoadingText');
+        setTimeout($rootScope.$broadcast('parkAssist:hideLoadingText'),1000);
         console.log('Marked meter: '+ meter);
       });
     }

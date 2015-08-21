@@ -29,9 +29,21 @@ $mapHeightMobile: 235px;
   }
 }
 
+.parking-lot {
+  @media screen and (min-width: $tablet) {
+    float: right;
+  }
+}
+
 .change-destination {
   @media screen and (min-width: $tablet) {
     float: right;
+  }
+}
+
+.reserve-spot {
+  @media screen and (min-width: $tablet) {
+    float: left;
   }
 }
 
