@@ -106,14 +106,15 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
   };
 
   var reserveSpot = function(){
-    // tell db to mark currentMeterId as reserved
     if (currentMeterId !== 'LOT'){
       $rootScope.$broadcast('parkAssist:changeLoadingText','reserving your spot');
       $rootScope.$broadcast('parkAssist:showLoadingText');
       console.log('reserveSpot from mapService.js with ', currentMeterId);
       Locator.reserveSpace(currentMeterId)
       .then(function(meter){
-        setTimeout($rootScope.$broadcast('parkAssist:hideLoadingText'),1000);
+        setTimeout(function(){
+          $rootScope.$broadcast('parkAssist:hideLoadingText')
+        },1000);
         console.log('Marked meter: '+ meter);
       });
     }
