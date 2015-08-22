@@ -24,7 +24,7 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
       return 'green';
     } else if (crimeScore < maxCrimeScore*3/4) {
       return 'yellow';
-    } else { return '../img/parkingRed.png'; }
+    } else { return 'red'; }
   }
 
   var setMeter = function(pSpot) {
@@ -32,17 +32,17 @@ map.factory('Map', ['Traffic', 'DirectionsDisplay', 'Geocoder', 'MapOptions', 'L
     meterLoc = new google.maps.LatLng(spot[0], spot[1]);
     var parkingPic;
     var ratingColor = getDangerRating(pSpot.compositeCrimeScore)
-    if (!pSpot.lot_id && ratingColor = 'red') {
+    if (!pSpot.lot_id && ratingColor === 'red') {
       parkingPic = '../img/parkingRed.png'
-    } else if (!pSpot.lot_id && ratingColor = 'yellow') {
+    } else if (!pSpot.lot_id && ratingColor === 'yellow') {
       parkingPic = '../img/parkingYellow.png'
-    } else if (!pSpot.lot_id && ratingColor = 'green') {
+    } else if (!pSpot.lot_id && ratingColor === 'green') {
       parkingPic = '../img/parkingGreen.png'
-    } else if (pSpot.lot_id && ratingColor = 'red') {
+    } else if (pSpot.lot_id && ratingColor === 'red') {
       parkingPic = '../img/lotRed.png'
-    } else if (pSpot.lot_id && ratingColor = 'yellow') {
+    } else if (pSpot.lot_id && ratingColor === 'yellow') {
       parkingPic = '../img/lotYellow.png'
-    } else if (pSpot.lot_id && ratingColor = 'green') {
+    } else if (pSpot.lot_id && ratingColor === 'green') {
       parkingPic = '../img/lotGreen.png'
     } else {
       parkingPic = '../img/parking.png'
