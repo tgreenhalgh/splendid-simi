@@ -19,6 +19,7 @@ The Santa Monica Parking API provides information on 6700+ meters local to Santa
 * [Express](http://expressjs.com/)
 * [Google Maps APIs](https://developers.google.com/maps/?hl=en/)
 * [City of Santa Monica Parking Data API](https://parking.api.smgov.net/)
+* [City of Santa Monica Crime Data API ](https://data.smgov.net/Public-Safety/Police-Incidents/kn6p-4y74)
 
 ####To start contributing to the Park Assist codebase:
   1. Fork the repo
