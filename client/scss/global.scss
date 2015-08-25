@@ -31,3 +31,13 @@ img {
   max-width: 450px;
   margin: 0 auto 10px auto;
 }
+
+.header {
+  position: relative;
+}
+
+.legend {
+  position: absolute;
+  top: 45px;
+  right: 5px;
+}

@@ -3,3 +3,4 @@ firebaselink.js
 node_modules/
 client/lib/bower/
 client/dist/
+/bower_components/*

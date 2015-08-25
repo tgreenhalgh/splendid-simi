@@ -1,14 +1,19 @@
 var express = require('express');
+var Q = require('q');
 var middleware = require('./config/middleware.js');
 var http = require('http');
 var request = require('request');
 var Firebase = require('firebase');
 var fb_keys = require('../firebaselink.js');
+var crimeScores = require('./crimeScoreMap.js');
+
 
 var app = express();
 middleware(app, express);
 
 app.set('port', process.env.PORT || 8080);
+
+var firedb = new Firebase(fb_keys.url);
 
 //Helper Functions
 //Function to calculate the euclidean distance between the user location and a parking spot
@@ -17,13 +22,14 @@ var distance = function(latU, longU, latP, longP) {
 }
 
 //---------------------------This section is to initalize our own Firebase MeterParkingSpots Database from the Santa Monica API--------------------------
-//GET /api/init 
+//GET /api/init
 app.post('/api/init', function(req, res) {
   console.log('server.js says: POST request for init received.');
 
   //Store all the metered parking spot information on our own database
   //Make a GET request
   var url = 'https://parking.api.smgov.net/meters'; //Santa Monica api that has location data on all metered parking spots
+  var lotUrl = 'https://parking.api.smgov.net/lots';
   request(url, function(error, response, body) {
     if (error) {
       console.log('Error getting data. Error:', error);
@@ -35,16 +41,48 @@ app.post('/api/init', function(req, res) {
       for (var key in body) {
         //console.log("Value at",key, " is",body[key]);
         var obj = body[key];
-        firedb.child("Metered Parking Spots").push({
+
+        firecloud.child("MeteredParkingSpots").child(obj.meter_id).set({
           meter_id: obj.meter_id,
           latitude: obj.latitude,
-          longitude: obj.longitude
+          longitude: obj.longitude,
+          compositeCrimeScore: 0  //sets starting point for crime scores
         });
       }
       res.send(200);
     }
   });
 }); // /api/init ends here
+
+app.post('/api/init/lots', function(req, res) {
+  console.log('server.js says: POST request for lots init received.');
+
+  //Store all the metered parking spot information on our own database
+  //Make a GET request
+  var lotUrl = 'https://parking.api.smgov.net/lots'; //Santa Monica api that has location data on all metered parking spots
+
+  request(lotUrl, function(error, response, body) {
+    if (error) {
+      console.log('Error getting data. Error:', error);
+    }
+    if (!error && response.statusCode == 200) {
+      body = JSON.parse(body);
+
+      //One time update of the database with the metered spots info
+      for (var key in body) {
+        //console.log("Value at",key, " is",body[key]);
+        var obj = body[key];
+        firecloud.child("ParkingLots").child(obj.id).set({
+          lot_id: obj.id,
+          latitude: obj.latitude,
+          longitude: obj.longitude,
+          compositeCrimeScore: 0
+        });
+      }
+      res.send(200);
+    }
+  });
+}); // /api/init/lots ends here
 //------------------------------------------End of Initializing MeterParkingSpots database-----------------------------------------------
 
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -76,13 +114,87 @@ usersRef.on('child_added', function(childSnapshot, prevChildKey) {
 
         pSpots[key].distance = displacement;
         if (pSpots[key].mostRecentEvent === 'SE') {
-          freeSpots[key] = pSpots[key];
+          if (pSpots[key].reserved){
+            if (pSpots[key].reserved < Date.now()){
+              freeSpots[key] = pSpots[key];
+            }
+          } else {
+            freeSpots[key] = pSpots[key];
+          }
         }
       } // end if condition to check if the parking spot is within range
     } // end of for loop for pSpots
     firecloud.child('Users').child(userKey).child('Recommendations').set(freeSpots); //adds the list of recomendations to the User in the database
   });
+
+  //getlots
+  firecloud.child('ParkingLots').once('value', function(snapshot) {
+
+    var pLots = snapshot.val(); //initializes variables for storing user specific information
+    var closeSpots = [];
+    var freeLots = {};
+
+    for (var key in pLots) {
+      var displacement = distance(tuple[0], tuple[1], pLots[key].latitude, pLots[key].longitude);
+      if (displacement < radius) {
+
+        pLots[key].distance = displacement;
+        if (pLots[key].available_spaces > 5) {
+          freeLots[key] = pLots[key];
+        }
+      } // end if condition to check if the parking lot is within range
+    } // end of for loop for pLots
+    firecloud.child('Users').child(userKey).child('LotRecommendations').set(freeLots); //adds the list of recomendations to the User in the database
+  });
+
 });
+
+//update crime data
+setInterval(function() {
+  return crimeScores.crimesFromDatabase()
+    .then(function(crimes) {
+      crimeData = crimeScores.makeArrayofNewCrimes(crimes, utility.calculateYesterday());
+      return crimeData;
+    })
+    .then(function(crimeData) {
+      // uses an array to return multiple values to the next function
+      return [crimeScores.parkingMetersFromDatabase(), crimeScores.parkingLotsFromDatabase(), crimeData];
+    })
+    // use spread instead of then to unpack the array of arguments
+    .spread(function(parkingMeters, parkingLots, crimeData) {
+        return crimeScores.crimeScoreMap(parkingMeters, parkingLots, crimeData);
+    }),
+    function(error) {
+      return errorHandling(error);
+    };
+}, 86400000);
+
+// updates parking meter's compositeCrimeScore using crimes from the past year
+var calculateCompositeCrimeforParkingAreas = function() {
+  return crimeScores.crimesFromDatabase()
+    .then(function(crimes) {
+      crimeData = crimeScores.makeArrayofAllCrimes(crimes);
+      return crimeData;
+    })
+    .then(function(crimeData) {
+      // uses an array to return multiple values to the next function
+      return [crimeScores.parkingMetersFromDatabase(), crimeScores.parkingLotsFromDatabase(), crimeData];
+    })
+    // use spread instead of then to unpack the array of arguments
+    .spread(function(parkingMeters, parkingLots, crimeData) {
+        return crimeScores.crimeScoreMap(parkingMeters, parkingLots, crimeData, true);
+    }),
+    function(error) {
+      return errorHandling(error);
+    };
+}
+
+// should be called only once to initialize composite scores for meters in database
+// calculateCompositeCrimeforParkingAreas();
+
+
+
+
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------
 
 module.exports = app;
