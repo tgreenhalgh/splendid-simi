@@ -27,7 +27,7 @@ The Santa Monica Parking API provides information on 6700+ meters local to Santa
   4. bower install - client dependencies
   5. Set your Google Maps API key in index.html
   6. gulp - run the app on a local server
-  7. Visit http://localhost:8000/ on your browser
+  7. Visit http://localhost:8080/ on your browser
 
 ####Google Developer Console API Dependencies:
   * **Google Maps JavaScript API v3** - Google Maps functionality via JS
@@ -95,14 +95,20 @@ js
     * **Geocoder** - Parses to Latitude/Longitude coordinates into a LatLng object w/ useful location data. Parses street address strings into LatLng objects.
     * **Locator** - Functionality for creating user based on browser user location. Each unique user location is posted into the database as a unique user on Geolocation resolution.
     * **Map** - Map initialization, logic for setting parking spot marker when meter is found and returning an instance of the map initialized on the DOM.
-    * **Markers** - Map marker methods for User and Parking Meters.
+    * **Markers** - Color coded map marker methods for User and Parking Meters.
     * **Traffic** - Traffic layer for Google Maps. Minimal ng service ideal for studying the code base file structure.
     * **User** - Watches user position through browser Geolocation data. Heavy dependency on Directions service.
 
 ###Buttons
-* **Show Me Another Spot** - Shows the user another candidate spot taken from the queue of meters.
+* **Show Me Another Spot** - Shows the user another candidate spot taken from the queue of parking meters.
 * **Enter Another Destination** - This will change the target destination of the user and repeat steps 1-6 above with that location information.
+* **Reserve This Spot** - This will remove the parking spot the user selected from all other user's recommended park spaces so no two users will be directed to the same parking space.
+* **Show Me a Parking Lot** - This will direct the user to the nearest parking space that has available parking spaces.
 
+###Color Code 
+    * **Map Legend** - The map legend in the upper-righthand corner of the application shows the color-codes for each parking meter and parking lot. Green indicates a weighted score of 500 or less crimes within the past year. Yellow indicates a weighted score of 500-750 crimes within the past year. Red indicates a weighted score of 750 or greater within the past year. 
+   * **Parking Icon** - When a marker appears on the page, the icon will be a P for a parking spot or an L for a parking lot. 
+  * **Parking Icon Color ** - The color of the parking icon (green, yellow, or red) is based on the compositeSafetyScore of each parking meter. The compositeSafetyScore is created using a weighted algorithm that looks at the frequency and severity of crimes that have occurred in an 0.2 mile radius of the parking space or parking lot.
 ##Back End
 
 ###Server Information
@@ -117,9 +123,9 @@ module.exports = {
 
 #####This is so that you can link it to your firebase database.
 
-* **"Parking Spot Analyzer" Server** - responsible for choosing the meters to be sent to the client. Its logic is stored in server/server.js in the main Parking Assist repository.
+* **"Parking Spot Analyzer" Server** - responsible for choosing the meters to be sent to the client and for updating the parking meter's composite crime scores daily. Its logic is stored in server/server.js in the main Parking Assist repository.
 
-* **"Cloudify" Server** - used to scrape the events from the City of Santa Monica parking API to keep the database updated. The source code for this server is located in the [dbScrape](https://github.com/splendid-simi/dbScrape) repository.
+* **"Cloudify" Server** - used to scrape the events from the City of Santa Monica parking meter and parking lot APIs to keep the database updated. Additionally, updates the compositeCrimeScores for each parking meter by scraping the City of Santa Monica crime API. The source code for this server is located in the [dbScrape](https://github.com/splendid-simi/dbScrape) repository. 
 
 **Steps to loading up the main page and routing a user to a parking space:**
 
@@ -141,12 +147,20 @@ We use Firebase to store the data.
 
 #####MeteredParkingSpots
 * #####MeterID
+  * compositeCrimeScore - safety score assigned to each parking meter based on frequency and severity of crimes that have happened within an 0.2 mile radius  
   * active - Set up with PSA server
   * latitude - Set up with PSA server
   * longitude - Set up with PSA server
   *  mostRecentEvent- Continually updated with Cloudify Server
   *  timeStamp- Continually updated with Cloudify Server
 
+* #####ParkingLots
+  * Firebase unique identifier
+    * available_spaces - number of available parking spaces in the parking lot 
+    * latitude - from Google Maps API
+    * logitude - from Google Maps API
+    * safety score assigned to each parking lot based on frequency and severity of crimes that have happened within an 0.2 mile radius  
+    * lot_id - unique lot identfier 
 
 * #####Users
   * Firebase unique identifier
@@ -155,6 +169,13 @@ We use Firebase to store the data.
     * range - auto set
     * Recomendations
     * array of objects with MeterID: {active, latitude, longitude, mostRecentEvent, timeStamp} same format as MeteredParkingSpots.
+  
+* #####CrimeIncident
+  * Firebase unique identifier
+    * dateOccurred 
+    * latitude - from Google Maps API
+    * logitude - from Google Maps API
+    * UCR - Uniform Crime Rating (police crime code for each type of crime)
 
 ###Application Flow
 
