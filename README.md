@@ -110,6 +110,7 @@ js
  * **Map Legend** - The map legend in the upper-righthand corner of the application shows the color-codes for each parking meter and parking lot. Green indicates a weighted score of 500 or less crimes within the past year. Yellow indicates a weighted score of 500-750 crimes within the past year. Red indicates a weighted score of 750 or greater within the past year. 
  * **Parking Icon** - When a marker appears on the page, the icon will be a P for a parking spot or an L for a parking lot. 
  * **Parking Icon Color** - The color of the parking icon (green, yellow, or red) is based on the compositeSafetyScore of each parking meter. The compositeSafetyScore is created using a weighted algorithm that looks at the frequency and severity of crimes that have occurred in an 0.2 mile radius of the parking space or parking lot.
+ 
 ##Back End
 
 ###Server Information
@@ -161,7 +162,7 @@ We use Firebase to store the data.
     * latitude - from Google Maps API
     * logitude - from Google Maps API
     * safety score assigned to each parking lot based on frequency and severity of crimes that have happened within an 0.2 mile radius  
-    * lot_id - unique lot identfier 
+    * lot_id - unique lot identifier 
 
 * #####Users
   * Firebase unique identifier
