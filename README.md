@@ -103,7 +103,7 @@ js
 ###Buttons
 * **Show Me Another Spot** - Shows the user another candidate spot taken from the queue of parking meters.
 * **Enter Another Destination** - This will change the target destination of the user and repeat steps 1-6 above with that location information.
-* **Reserve This Spot** - This will remove the parking spot the user selected from all other user's recommended park spaces so no two users will be directed to the same parking space.
+* **Reserve This Spot** - This will remove the parking spot the user selected from all other user's recommended parking spaces so no two users will be directed to the same parking space.
 * **Show Me a Parking Lot** - This will direct the user to the nearest parking space that has available parking spaces.
 
 ###Color Code 
@@ -179,7 +179,7 @@ We use Firebase to store the data.
     * logitude - from Google Maps API
     * UCR - Uniform Crime Rating (police crime code for each type of crime)
 
-###Application Flow
+###Basic Application Flow
 
 ![alt text](https://github.com/rodocite/splendid-simi/blob/dev/applicationflow.jpg)
 
