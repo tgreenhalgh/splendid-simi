@@ -29,7 +29,7 @@ geocoder.factory('Geocoder', [function() {
 
   var parseAddress = function(address) {
     var deferred = Q.defer();
-    
+
     var geocodeOptions = {
       address: address
     };

@@ -76,12 +76,13 @@ gulp.task('libJS', function() {
     .pipe(gulp.dest(paths.dist));
 });
 
+/*
 gulp.task('minJS', ['libJS', 'js'], function() {
   return gulp.src(paths.scripts.dist)
     .pipe(uglify())
     .pipe(gulp.dest(paths.dist));
 });
-
+*/
 gulp.task('minCSS', ['libCSS', 'scss'], function() {
   return gulp.src(paths.styles.dist)
     .pipe(cssmin())

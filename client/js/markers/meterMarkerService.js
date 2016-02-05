@@ -71,8 +71,8 @@ marker.factory('MeterMarkers', ['Geocoder', function(Geocoder) {
   };
 
   var addMarker = function(map, active, LatLng, scaledCrimeParkingPic) {
-    var lat = LatLng.G;
-    var lng = LatLng.K;
+    var lat = LatLng.lat();
+    var lng = LatLng.lng();
     var image = {
       url: scaledCrimeParkingPic,
       size: new google.maps.Size(50, 50),
@@ -116,6 +116,9 @@ marker.factory('MeterMarkers', ['Geocoder', function(Geocoder) {
         bubbleOpen = false;
       });
 
+    })
+    .catch(function(err) {
+      console.warn(err);
     });
 
   };
